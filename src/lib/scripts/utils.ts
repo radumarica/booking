@@ -213,10 +213,18 @@ export const getRoomDetails = (cart: TypeCartDetails['cart'], hotelsDetails: Typ
 
 export const getTotals = (cart: TypeCartDetails['cart'], hotelsDetails: TypeHotelDetails[]) => {
     const roomDetails = getRoomDetails(cart, hotelsDetails);
-
+   
+    const hotel = localStorage.getItem('hotel');
     let roomPrice = 0;
     let roomRatio = 0;
     let totalPrice = 0;
+    if(hotel === 'roomType-1'){
+        roomPrice = 100
+    }else if(hotel === 'roomType-2'){
+        roomPrice = 175
+    }else{
+        roomPrice = 250
+    }
     if (roomDetails?.type && roomDetails?.view) {
         roomPrice = roomDetails.type.price;
         roomRatio = roomDetails.view.price_rate;
@@ -224,9 +232,10 @@ export const getTotals = (cart: TypeCartDetails['cart'], hotelsDetails: TypeHote
             totalPrice = getTotalPrice(roomPrice, +cart.days, +cart.adults);
         }
     }
-
+    const days = cart.days;
+    console.log(days)
     const finalPrice = (roomRatio / 100) * totalPrice + totalPrice;
-
+    totalPrice = roomPrice * Number(days);
     return {
         room: roomPrice,
         total: totalPrice,
