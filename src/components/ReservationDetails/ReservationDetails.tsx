@@ -32,10 +32,7 @@ const ReservationDetails: React.FC<TypeReservationDetailsProps> = (props: TypeRe
                 !!roomDetails && roomDetails.type ? (
                     <ReservationDetailsItem title="Room" value={roomDetails.type.title} />
                 ) : null,
-            view:
-                !!roomDetails && roomDetails.view ? (
-                    <ReservationDetailsItem title="View" value={roomDetails.view.title} />
-                ) : null,
+         
             coupon: <ReservationCoupon />,
             totals: <ReservationTotals />
         };
@@ -51,12 +48,16 @@ const ReservationDetails: React.FC<TypeReservationDetailsProps> = (props: TypeRe
     if (props.type) {
         elClasses.push(itemStyleClasses['reservation-details--boxes']);
     }
-
+    const hotels = [{hotel_name :"PALMVERSE Tamarindo, Costa Rica",city:"Tamarido"},
+    {hotel_name :"PALMVERSE Nosara, Costa Rica",city:"Nosara",},
+    {hotel_name:"PALMVERSE Santa Teresa, Costa Rica",city:"Santa Teresa"},
+    {hotel_name :"PALMVERSE Miami, USA",city:"Miami"}]
+    const hotelId : string = selectedHotel?.details?.id!;
     return (
         <div className={elClasses.join(' ')}>
             <h2 className={styleClasses['reservation-details__title']}>
-                {!!selectedHotel ? selectedHotel.name : ''}{' '}
-                {selectedHotel?.details?.city && <span>{`(${selectedHotel.details.city})`}</span>}
+                {!!hotels ? hotels[Number(hotelId)-1].hotel_name : ''}{' '}
+                {!!hotels && <span>{`(${hotels[Number(hotelId)-1].city})`}</span>}
             </h2>
             <ul className={styleClasses['reservation-details__list']}>
                 {renderDetailsItem('checkin')}

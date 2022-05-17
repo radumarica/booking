@@ -21,15 +21,25 @@
         padding: 1rem 0;
 
         &__title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            text-transform: uppercase;
+            text-decoration:none;
+            font-style:normal;
+            font-weight:700;
+            font-family:Roboto;
+            position:relative;
+            margin-left:620px;
+            margin-top:-1px; 
+            color:#d025b9;
+            font-size:40px;
         }
         &__slogan {
-            margin-top: 0.25rem;
-            font-weight: 700;
-            font-size: 0.75rem;
-            letter-spacing: 0.0125rem;
+            left:531px;
+            font-size:19px;
+            position:relative;
+            width:260px;
+            color:#fcfcfc;
+            margin-left:78px;
+            margin-top:4px;
+            
         }
     }
     &__actions {
@@ -39,4 +49,6 @@
             margin: 0 0 0 auto;
         }
     }
+
+    
 }

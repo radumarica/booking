@@ -12,8 +12,8 @@ type TypeHeader = {
 const Header: React.FC<TypeHeader> = (props: TypeHeader) => (
     <header className={styleClasses['header']}>
         <div className={styleClasses['header__logo']}>
-            <span className={styleClasses['header__logo__title']}>Awesome Hotel</span>
-            <span className={styleClasses['header__logo__slogan']}>Reservation System</span>
+            <span className={styleClasses['header__logo__title']}>PALMVERSE</span>
+            <span className={styleClasses['header__logo__slogan']}>Pay with crypto or credit card.</span>
         </div>
         {props.activeStep !== 0 && (
             <div className={styleClasses['header__actions']}>
