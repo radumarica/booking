@@ -152,6 +152,7 @@ const HotelDate: React.FC<TypeReservationStep> = (
                 [validatorjs.isDate],
                 [validatorjs.isAfter, value],
               ]);
+              localStorage.setItem('indate', value);
             }}
           />
           <TextField

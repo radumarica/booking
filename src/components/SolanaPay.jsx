@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useCart } from 'hooks'
-import { PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL, clusterApiUrl } from '@solana/web3.js';
 import image from '../components/pay.png'
 import {
     useConnection,
@@ -13,12 +13,13 @@ import {
 import styleClasses from '../components/ReservationDetails/ReservationTotals/ReservationTotals.module.scss'
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import './sol.css'
-import { get } from 'lodash';
-import { TransactionInstruction } from '@solana/web3.js';
 import { Modal } from 'react-bootstrap'
+import { getParsedNftAccountsByOwner, isValidSolanaAddress, createConnectionConfig, } from "@nfteyez/sol-rayz"
+
 const shopAddress = new PublicKey('HekSQzW1Yx7hiGqk41iSy8bcELLHvWn34fUe5ukyDya1')
+
 function SolanaPay() {
-    const [solanaRate, setSolanaRate] = useState('')
+    const [solanaRate, setSolanaRate] = useState(0)
     const { totals, cart } = useCart();
     const { connection } = useConnection();
     const { publicKey, sendTransaction } = useWallet();
@@ -27,7 +28,35 @@ function SolanaPay() {
     const [show, setShow] = useState(false);
     const [tID, setTID] = useState('');
     const [closed, setClosed] = useState(false);
+    const [a, setA] = useState();
+    const [nfts, setNfts] = useState([])
     let id;
+
+    useEffect(() => {
+        const getAllNftData = async () => {
+            try {
+                if (connection && publicKey) {
+
+                    const connect = await createConnectionConfig(clusterApiUrl("devnet"))
+                    const result = await isValidSolanaAddress(publicKey);
+                    console.log(connect);
+                    console.log("result", result);
+                    const nfts = await getParsedNftAccountsByOwner({
+                        publicAddress: publicKey,
+                        connection: connect,
+                        serialization: true,
+                    })
+                    setNfts(nfts)
+                    return nfts;
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        getAllNftData()
+    }, [connection, publicKey])
+
 
     useEffect(() => {
         if (closed) {
@@ -41,7 +70,6 @@ function SolanaPay() {
     { hotel_name: "PALMVERSE Miami, USA", city: "Miami" }]
 
     const hotel = hotels[key - 1];
-    console.log(hotel);
     let amount = totalAmount / solanaRate;
     let roomPrice = totals.room / solanaRate;
     const pay = useCallback(async () => {
@@ -50,7 +78,7 @@ function SolanaPay() {
             SystemProgram.transfer({
                 fromPubkey: publicKey,
                 toPubkey: shopAddress,
-                lamports: LAMPORTS_PER_SOL * amount.toFixed(3),
+                lamports: LAMPORTS_PER_SOL * a.toFixed(3),
             })
         );
 
@@ -70,31 +98,42 @@ function SolanaPay() {
     }, [publicKey, sendTransaction, connection]);
 
 
-
-    useEffect(() => {
+    const getPrice = () => {
         var requestOptions = {
             method: 'GET',
             redirect: 'follow'
+
         };
 
         fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd", requestOptions)
             .then(response => response.json())
-            .then(result => setSolanaRate(result.solana.usd))
+            .then(result => {
+                setSolanaRate(result.solana.usd);
+            })
             .catch(error => console.log('error', error));
-    }, [])
+
+        setTimeout(getPrice, 500)
+    }
+
+    getPrice();
+
+
+    useEffect(() => {
+        setA(totalAmount / solanaRate)
+    }, [solanaRate])
 
     return (
         <div className='solcontainer' >
             <Modal show={show} onHide={() => {
                 setShow(false);
-                setClosed(true)
+                setClosed(true);
                 window.location.href = "/"
             }}  >
                 <Modal.Header closeButton >Successful Transaction!</Modal.Header>
                 <Modal.Title style={{ fontSize: "20px", marginLeft: "6px", padding: "20px 10px" }} >Thank you for your reservation at Palmverse !</Modal.Title>
                 <div className='code' style={{ width: "95%" }} >
 
-                <Modal.Body className='code2' style={{ overflowX: "scroll" }} >Your transaction ID is :<code> {tID}</code> </Modal.Body>
+                    <Modal.Body className='code2' style={{ overflowX: "scroll" }} >Your transaction ID is :<code> {tID}</code> </Modal.Body>
                 </div>
                 <button style={{ backgroundColor: "skyblue", width: "fit-content", margin: "auto", padding: "6px", borderRadius: "4px", marginBottom: "16px" }} onClick={() => {
                     navigator.clipboard.writeText(tID);
@@ -112,7 +151,7 @@ function SolanaPay() {
             <div className='body' >
 
                 <h2>Amount in USD : ${parseInt(totalAmount)}</h2>
-                <h2>Amount in Sol : {amount.toFixed(3)} SOL</h2>
+                <h2>Amount in Sol : {solanaRate && a.toFixed(3)} SOL</h2>
                 <button
                     onClick={() => pay()}
                     style={{ border: 'none', outline: 'none', padding: 0, marginTop: "2rem" }}
@@ -200,6 +239,30 @@ function SolanaPay() {
                             </span>
 
                         </div>
+                        {
+                            nfts.length > 0 ? (<div
+                                style={{ textAlign: 'center', display: "flex", justifyContent: "center", padding: "2rem", fontSize: "24px" }}
+                                className={styleClasses['reservation-details__totals__item']}
+                            >
+                                NFTs found
+
+                            </div>) : (
+                                <div
+                                    style={{ textAlign: 'center', display: "flex", justifyContent: "center", padding: "2rem", fontSize: "24px" }}
+                                    className={styleClasses['reservation-details__totals__item']}
+                                >
+                                    <span
+                                        className={
+                                            styleClasses['reservation-details__totals__title']
+                                        }
+                                    >
+                                        No NFTs found in your wallet
+                                    </span>
+
+
+                                </div>
+                            )
+                        }
                     </li>
                 </div>
             </div>
