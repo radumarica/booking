@@ -139,9 +139,8 @@ const HotelDate: React.FC<TypeReservationStep> = (
         <div className={formClasses['form__wide-row']}>
           <TextField
             id="checkin"
-            type="text"
+            type="date"
             label="Check-in"
-            placeholder="dd-mm-yy"
             value={formState.inputs.checkin.value}
             validity={formState.inputs.checkin.isValid}
             isTouched={formState.inputs.checkin.isTouched}
@@ -158,9 +157,8 @@ const HotelDate: React.FC<TypeReservationStep> = (
           />
           <TextField
             id="checkout"
-            type="text"
+            type="date"
             label="Check-out"
-            placeholder="dd-mm-yy"
             value={formState.inputs.checkout.value}
             validity={formState.inputs.checkout.isValid}
             isTouched={formState.inputs.checkout.isTouched}
